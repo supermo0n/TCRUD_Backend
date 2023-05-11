@@ -33,7 +33,7 @@ public class Board extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE
             ,generator = "SQ_BOARD_GENERATOR")
-    private Long id; // 글번호
+    private Long id;
 
     @Column(length = 50, nullable = false, name = "TITLE")
     private String title;
@@ -48,10 +48,11 @@ public class Board extends BaseTimeEntity{
     @JoinColumn(name = "USER_ID")
     private User writer;
 
-//    @JsonManagedReference
+
     @JsonIgnoreProperties({"board"})
     @Builder.Default
     @OneToMany(mappedBy = "board", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OrderBy("insertTime asc")
     private List<Reply> replyList = new ArrayList<>();
 
     public void viewCntUp() {

@@ -45,13 +45,12 @@ public class User extends BaseTimeEntity{
     // 사용자의 로그인id
     @Column(unique = true)
     @NotBlank
-
     @Size(min = 6, max = 20)
     private String username;
 
     // 사용자의 닉네임
     @Column(unique = true)
-    @NotNull
+    @NotBlank
     @Size(min = 3, max = 10)
     private String nickname;
 
@@ -84,7 +83,6 @@ public class User extends BaseTimeEntity{
 
     public User update(String name) {
         this.username = username;
-
         return this;
     }
 

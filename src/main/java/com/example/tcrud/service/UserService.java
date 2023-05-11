@@ -1,15 +1,15 @@
 package com.example.tcrud.service;
 
 import com.example.tcrud.dto.UserDto;
-import com.example.tcrud.model.ERole;
-import com.example.tcrud.model.Role;
-import com.example.tcrud.model.User;
-import com.example.tcrud.model.UserRole;
+import com.example.tcrud.model.*;
+import com.example.tcrud.repository.BoardRepository;
+import com.example.tcrud.repository.ReplyRepository;
 import com.example.tcrud.repository.RoleRepository;
 import com.example.tcrud.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +25,12 @@ public class UserService {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    BoardRepository boardRepository;
+
+    @Autowired
+    ReplyRepository replyRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -138,5 +144,25 @@ public class UserService {
         } else {
             return false;
         }
+    }
+
+    public Optional<User> findByUserId(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        return optionalUser;
+    }
+
+    @Transactional
+    public Boolean deleteUser(String username) {
+        userRepository.deleteByUsername(username);
+        return !userRepository.existsByUsernameAndDeleteYn(username, "N");
+    }
+    @Transactional
+    public void deleteWrittenBoardReply(Long userId) {
+
+        List<Board> boards = boardRepository.findByWriterId(userId);
+        List<Reply> replies = replyRepository.findByWriterId(userId);
+
+        boardRepository.deleteAll(boards);
+        replyRepository.deleteAll(replies);
     }
 }

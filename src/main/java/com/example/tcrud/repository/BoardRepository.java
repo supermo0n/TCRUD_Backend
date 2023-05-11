@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -46,4 +47,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     //    제목에 댓글 개수 표시위한 count query
     @Query(value = "SELECT COUNT(*) FROM TB_REPLY WHERE BOARD_ID = :id AND DELETE_YN = 'N'", nativeQuery = true)
     int getReplyCountByBoardId(@Param("id") Long boardId);
+
+    List<Board> findByWriterId(@Param("WriterId") Long userId);
 }

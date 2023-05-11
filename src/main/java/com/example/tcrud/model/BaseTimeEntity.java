@@ -12,36 +12,46 @@ import java.time.format.DateTimeFormatter;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseTimeEntity {
 
-//    생성일자
+    //    생성일자
     @Column(name = "INSERT_TIME")
-    private String insertTime;
-//    수정일자
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime insertTime;
+    //    수정일자
     @Column(name = "UPDATE_TIME")
-    private String updateTime;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime updateTime;
     //    Soft Delete Switch
     @Column(name = "DELETE_YN")
     private String deleteYn;
+    //    삭제일자
     @Column(name = "DELETE_TIME")
-    private String deleteTime;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime deleteTime;
 
     @PrePersist
     void onPrePersist() {
-        this.insertTime = LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.insertTime = LocalDateTime.now();
         this.deleteYn = "N";
     }
 
     @PreUpdate
     void onPreUpdate() {
-        this.updateTime = LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-//        this.insertTime = this.updateTime;
-        this.deleteYn = "N";
+        this.updateTime = LocalDateTime.now();
+        this.deleteYn = "Y";
     }
 
-    public String getInsertTime()
-    {
+    public LocalDateTime getInsertTime() {
         return this.insertTime;
+    }
+
+    public void setDelete(){
+        this.deleteYn = "Y";
+        this.deleteTime = LocalDateTime.now();
+    }
+
+    public String getDeleteSw()
+    {
+        return this.deleteYn;
     }
 }
 

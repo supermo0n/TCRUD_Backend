@@ -32,7 +32,6 @@ public class Role extends BaseTimeEntity {
     @Column
     private Long id;
 
-    // EnumType - ORDINAL - 순서  , STRING - 문자열
     @Enumerated(EnumType.STRING)
     @Column
     private ERole name;
