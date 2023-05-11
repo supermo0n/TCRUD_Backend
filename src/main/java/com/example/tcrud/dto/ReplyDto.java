@@ -3,8 +3,11 @@ package com.example.tcrud.dto;
 import com.example.tcrud.model.Board;
 import com.example.tcrud.model.Reply;
 import com.example.tcrud.model.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 public class ReplyDto {
 
@@ -53,8 +56,11 @@ public class ReplyDto {
         private Long id;
         private UserDto.Writer writer;
         private String content;
-        private String insertTime;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime insertTime;
         private Long boardId;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime updateTime;
 
         public Response(Reply reply) {
             this.id = reply.getId();
@@ -62,6 +68,7 @@ public class ReplyDto {
             this.content = reply.getContent();
             this.insertTime = reply.getInsertTime();
             this.boardId = reply.getBoard().getId();
+            this.updateTime = reply.getUpdateTime();
         }
     }
 }

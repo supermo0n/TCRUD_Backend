@@ -3,7 +3,10 @@ package com.example.tcrud.dto;
 
 import com.example.tcrud.model.Board;
 import com.example.tcrud.model.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 public class BoardDto {
 
@@ -40,7 +43,8 @@ public class BoardDto {
         private String content;
         private Integer replycnt;
         private Long viewcnt;
-        private String insertTime;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime insertTime;
         private UserDto.Writer writer;
 
         public BoardListDto(Board board) {
@@ -61,9 +65,11 @@ public class BoardDto {
         private String title;
         private String content;
         private Long viewcnt;
-        private String insertTime;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime insertTime;
         private UserDto.Writer writer;
-        private String updateTime;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime updateTime;
 
         public getBoardDto(Board board) {
             this.id = board.getId();
@@ -73,7 +79,6 @@ public class BoardDto {
             this.insertTime = board.getInsertTime();
             this.writer = new UserDto.Writer(board.getWriter());
             this.updateTime = (board.getUpdateTime());
-
         }
     }
 }
