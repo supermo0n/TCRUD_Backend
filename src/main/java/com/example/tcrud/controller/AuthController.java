@@ -222,26 +222,34 @@ public class AuthController {
     @DeleteMapping("/user/deletion/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, Principal principal) {
         try {
-
             Optional<User> optionalUser = userService.findByUserId(id);
 
-            if (optionalUser.isPresent()) {
-
+            if (optionalUser.isPresent())
+            {
                 User tempUser = optionalUser.get();
 
                 boolean authUserMatch = tempUser.getUsername().equals(principal.getName());
 
-                if (authUserMatch) {
-                    userService.deleteWrittenBoardReply(id);
-                    userService.deleteUser(tempUser.getUsername());
+                if (authUserMatch)
+                {
+                    boolean deleteSuccess = userService.deleteUser(id, tempUser.getUsername());
 
-                    return new ResponseEntity<>(true, HttpStatus.OK);
-                } else {
+                    if (deleteSuccess)
+                    {
+                        return new ResponseEntity<>(true, HttpStatus.OK);
+                    }
+                }
+                else
+                {
                     return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
                 }
-            } else {
+            }
+            else
+            {
                 return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
+
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }

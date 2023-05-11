@@ -160,17 +160,15 @@ public class UserService {
     }
 
     @Transactional
-    public Boolean deleteUser(String username) {
-        userRepository.deleteByUsername(username);
-        return !userRepository.existsByUsernameAndDeleteYn(username, "N");
-    }
-    @Transactional
-    public void deleteWrittenBoardReply(Long userId) {
+    public Boolean deleteUser(Long userId, String username) {
 
         List<Board> boards = boardRepository.findByWriterId(userId);
         List<Reply> replies = replyRepository.findByWriterId(userId);
 
         boardRepository.deleteAll(boards);
         replyRepository.deleteAll(replies);
+
+        userRepository.deleteById(userId);
+        return !userRepository.existsByUsernameAndDeleteYn(username, "N");
     }
 }
