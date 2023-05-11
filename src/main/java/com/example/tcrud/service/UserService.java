@@ -120,6 +120,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public Boolean updateUser(UserDto.Request request) {
         Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
 
@@ -127,21 +128,28 @@ public class UserService {
             User user = optionalUser.get();
 
             if (request.isChangePwd()) {
-                if (encoder.matches(request.getPassword(), user.getPassword())) {
-                    return false;
-                } else {
-                    user.setPassword(encoder.encode(request.getPassword()));
-                }
-            } else if (!request.getNickname().isEmpty()) {
-                user.setNickname(request.getNickname());
 
-            } else {
+                if (encoder.matches(request.getPassword(), user.getPassword())) {
+                    user.setPassword(encoder.encode(request.getUpdatePwd()));
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (!request.getNickname().isEmpty() && !request.isChangePwd())
+            {
+                user.setNickname(request.getNickname());
+            }
+            else
+            {
                 return false;
             }
-
             userRepository.save(user);
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }

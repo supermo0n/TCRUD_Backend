@@ -171,19 +171,25 @@ public class AuthController {
         }
     }
 
+    //    회원정보 수정(업데이트)
     @PutMapping("/user/update")
     public ResponseEntity<?> updateUser(@RequestBody UserDto.Request updateRequest, Principal principal) {
         try {
             if (!principal.getName().matches(updateRequest.getUsername())) {
                 return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
             } else {
-
                 boolean updateUser = userService.updateUser(updateRequest);
 
                 if (updateUser) {
 
-                    Authentication authentication = authenticationManager.authenticate(
-                            new UsernamePasswordAuthenticationToken(updateRequest.getUsername(), updateRequest.getPassword()));
+                    Authentication authentication;
+                    if (updateRequest.isChangePwd()) {
+                        authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(updateRequest.getUsername(), updateRequest.getUpdatePwd()));
+                    } else {
+                        authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(updateRequest.getUsername(), updateRequest.getPassword()));
+                    }
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 

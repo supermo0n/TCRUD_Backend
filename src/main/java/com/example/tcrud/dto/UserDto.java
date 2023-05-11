@@ -48,6 +48,9 @@ public class UserDto {
 
         private boolean changePwd;
 
+        @Pattern(regexp = "^[A-Za-z\\d$@$!%*?&]{6,20}$")
+        @Size(min=6, max=120)
+        private String updatePwd;
     }
 
     @Getter

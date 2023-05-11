@@ -37,7 +37,7 @@ public abstract class BaseTimeEntity {
     @PreUpdate
     void onPreUpdate() {
         this.updateTime = LocalDateTime.now();
-        this.deleteYn = "Y";
+        this.deleteYn = "N";
     }
 
     public LocalDateTime getInsertTime() {
