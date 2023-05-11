@@ -243,7 +243,7 @@ public class AuthController {
                 return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
