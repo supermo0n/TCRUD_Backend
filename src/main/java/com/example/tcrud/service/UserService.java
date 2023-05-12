@@ -131,25 +131,17 @@ public class UserService {
 
                 if (encoder.matches(request.getPassword(), user.getPassword())) {
                     user.setPassword(encoder.encode(request.getUpdatePwd()));
-                }
-                else
-                {
+                } else {
                     return false;
                 }
-            }
-            else if (!request.getNickname().isEmpty() && !request.isChangePwd())
-            {
+            } else if (!request.getNickname().isEmpty() && !request.isChangePwd()) {
                 user.setNickname(request.getNickname());
-            }
-            else
-            {
+            } else {
                 return false;
             }
             userRepository.save(user);
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }

@@ -45,8 +45,7 @@ public class BoardController {
             Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
             Page<BoardDto.BoardListDto> boardDtoResponsePage;
 
-            if (searchSelect.isEmpty())
-            {
+            if (searchSelect.isEmpty()) {
                 boardDtoResponsePage = boardService.readAllBoard(pageable);
             } else {
                 boardDtoResponsePage = boardService.getBoardList(searchSelect, searchKeyword, pageable);
@@ -118,8 +117,7 @@ public class BoardController {
     @PutMapping("/board/{boardId}")
     public ResponseEntity<Object> updateBoard(@PathVariable Long boardId,
                                               @RequestBody BoardDto.Request request,
-                                              Principal principal)
-                                               {
+                                              Principal principal) {
         try {
             Optional<User> optionalUser = userService.findByUsername(principal.getName());
 
@@ -173,8 +171,7 @@ public class BoardController {
 
     //    TODO : GETMAPPING /board/{boardId}/reply
     @GetMapping("/board/{boardId}/reply")
-    public ResponseEntity<Object> readReply(@PathVariable Long boardId, @RequestParam(defaultValue = "0") int page)
-    {
+    public ResponseEntity<Object> readReply(@PathVariable Long boardId, @RequestParam(defaultValue = "0") int page) {
         try {
             boolean targetBoard = boardService.optionalfindById(boardId).isPresent();
 
@@ -185,8 +182,7 @@ public class BoardController {
 
                 List<ReplyDto.Response> responseList = new ArrayList<>();
 
-                for (ReplyDto.Response reply : replyPage.getContent())
-                {
+                for (ReplyDto.Response reply : replyPage.getContent()) {
                     responseList.add(reply);
                 }
 
@@ -197,18 +193,16 @@ public class BoardController {
                 responseBody.put("totalPages", replyPage.getTotalPages());
 
                 return new ResponseEntity<>(responseBody, HttpStatus.OK);
-                }
-            else{
-                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-                }
+            } else {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            catch (Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-//  TODO : Create Reply /board/{boardId}/reply/
+    //  TODO : Create Reply /board/{boardId}/reply/
     @PostMapping("/board/{boardId}/reply")
     public ResponseEntity<Object> createReply(@PathVariable Long boardId,
                                               @RequestBody ReplyDto.Request request,

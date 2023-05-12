@@ -119,7 +119,7 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse("서버 오류 발생")); // 기타 예외 발생 시 500 에러 반환
+                    .body(new MessageResponse("서버 오류 발생"));
         }
     }
 
@@ -149,7 +149,7 @@ public class AuthController {
         }
     }
 
-    //  비밀번호 변경시 현재 사용 비밀번호 확인절차, 통과시 비밀번호 변경 처리
+    //  회원정보 수정 전, 비밀번호 확인절차. 통과시 회원정보 수정 접근
     @PostMapping("/matchpwd")
     public ResponseEntity<?> matchPassword(@RequestBody UserDto.pwdCheck request,
                                            Principal principal) {
