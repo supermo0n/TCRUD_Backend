@@ -31,42 +31,38 @@ TCRUD는 **TOTAL CRUD**의 약자로 프로젝트명을 정했습니다.
 <p></p>
    
 1. 대댓글 구현
-   
-
+<p></p>
 <img src='https://github.com/supermo0n/supermo0n.github.io/assets/132265663/30b16e5c-e906-4807-a5f4-3436b6bc711f'>
 <p></p>
 <img src='https://github.com/supermo0n/supermo0n.github.io/assets/132265663/110eef3d-35f6-4d3f-aa9f-fd1048823c01'>
 
 단순 댓글 기능에서 계층형 댓글 구현.
-Reply Entity 수정 및 Front(Vue.js)에서 댓글 노출을 위한 옵션(hidden) 추가.
-	<p></p>
-만약, 자식 댓글이 있는 댓글을 삭제할 경우 => hidden = 'Y'
-	<p></p>
+Reply Entity 수정 및 Front(Vue.js)에서 댓글 노출을 위한 옵션(hidden) 추가.<p></p>
+만약, 자식 댓글이 있는 댓글을 삭제할 경우 => hidden = 'Y'<p></p>
 👉 자식 댓글이 없는 경우 => 기존의 삭제 로직 수행
- 기존 페이징 방식(Pageable)으론 제대로 된 페이징 구현이 어려움.
-<p></p>👉 v0.3에서 페이징 재적용 위한 시도.
-
+기존 페이징 방식(Pageable)으론 제대로 된 페이징 구현이 어려움.<p></p>
+👉 v0.3에서 페이징 재적용 위한 시도.
 <p></p>
-
+<br>
+	
 2. HTTP Response 일부 수정
 <p></p>
 
 <img src='https://github.com/supermo0n/supermo0n.github.io/assets/132265663/529e4bfc-ca8b-4592-ab98-4e46093687f1'>
 
-
-이미 서비스 하고있는 여러 사이트에서 잘못된 로그인 시도를 하며 콘솔을 확인한 결과
-HTTP STATUS를 노출시키지 않음.
-👉 일부 API 응답에 새로운 messageResponse를 이용, 상태+메세지를 함께 전송하는 방식을 적용
-👉 URI 및 메소드 노출로 인한 보안우려를 낮출 가능성
-
-
+이미 서비스 하고있는 여러 사이트에서 잘못된 로그인 시도를 하며 콘솔을 확인한 결과 HTTP STATUS를 노출시키지 않음.
 <p></p>
-
+👉 일부 API 응답에 새로운 messageResponse를 이용, 상태+메세지를 함께 전송하는 방식을 적용
+<p></p>
+👉 URI 및 메소드 노출로 인한 보안우려를 낮출 가능성
+<p></p>
+<br>
+	
 3. CKEditor 적용
-
+<p></p>
 <img src='https://github.com/supermo0n/supermo0n.github.io/assets/132265663/a55fa8cc-a2f5-4439-bb17-41cba81a1def'>
-
-기존 사용중이던 textarea 입력 폼 대신 CKEDITOR 적용. 
+<p></p>
+기존 사용중이던 textarea 입력 폼 대신 CKEDITOR 적용. <p></p>
 👉 CSS 문제가 일부 있음. 차후 수정 또는 다른 리치 에디터 적용 검토.
    
 
