@@ -1,4 +1,4 @@
-# TCRUD_Backend (v0.1)
+# TCRUD_Backend (v0.2)
 
   
 
@@ -17,6 +17,10 @@ TCRUD는 **TOTAL CRUD**의 약자로 프로젝트명을 정했습니다.
  - 게시글 작성 / 수정 / 삭제 / 검색 / 페이징
  - 댓글 작성 / 수정 / 삭제 / 페이징
  
+### TCRUD 구현기능 (v0.2)
+
+- 대댓글(NestedReply) 적용(v0.1의 페이징 제거)
+- HTTP RESPONSE 일부 수정
 
 ### 사용 기술 및 도구
  - Backend
