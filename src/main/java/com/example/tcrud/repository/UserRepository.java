@@ -12,8 +12,8 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("SELECT u FROM User u WHERE u.username = :username AND u.deleteYn = 'N'")
-    Optional<User> findByUsername(String username);
+    @Query("SELECT u FROM User u WHERE u.username = :username")
+    Optional<User> findByUsername(@Param("username") String username);
 
     boolean existsByUsernameAndDeleteYn(@Param("username") String username, @Param("deleteYn") String deleteYn);
 
@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByNicknameAndDeleteYn(@Param("nickname") String nickname, @Param("deleteYn") String deleteYn);
 
-    void deleteByUsername(String username);
+
 }
 
 

@@ -83,6 +83,11 @@ public class UserService {
         return optionalUser;
     }
 
+    public Optional<User> findByUserId(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        return optionalUser;
+    }
+
     public Boolean validationUser(String param, String keyword) {
         switch (param) {
             case "username":
@@ -144,11 +149,6 @@ public class UserService {
         } else {
             return false;
         }
-    }
-
-    public Optional<User> findByUserId(Long userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        return optionalUser;
     }
 
     @Transactional

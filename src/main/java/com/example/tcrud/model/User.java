@@ -30,12 +30,12 @@ import java.util.stream.Collectors;
         @UniqueConstraint(columnNames = "email"),
         @UniqueConstraint(columnNames = "nickname")
         // username(로그인ID, 이메일, 닉네임은 unique 제약)
-    }
+}
 )
 @Where(clause = "DELETE_YN = 'N'")
-@SQLDelete(sql="UPDATE TB_USER SET DELETE_YN = 'Y', DELETE_TIME = TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') WHERE ID = ?")
+@SQLDelete(sql="UPDATE TB_USER SET DELETE_YN = 'Y', DELETE_TIME = CURRENT_TIMESTAMP WHERE ID = ?")
 public class User extends BaseTimeEntity{
-
+    // 시퀀스 번호 - 유져 고유번호.
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE
             , generator = "SQ_USER_GENERATOR")
@@ -44,23 +44,18 @@ public class User extends BaseTimeEntity{
 
     // 사용자의 로그인id
     @Column(unique = true)
-    @NotBlank
     @Size(min = 6, max = 20)
     private String username;
 
     // 사용자의 닉네임
     @Column(unique = true)
-    @NotBlank
     @Size(min = 3, max = 10)
     private String nickname;
 
     @Column(unique = true)
-    @NotBlank
-    @Email
     @Size(max=50)
     private String email;
 
-    @NotBlank
     @Size(min=6, max=120)
     private String password;
 
@@ -73,7 +68,6 @@ public class User extends BaseTimeEntity{
                 .collect(Collectors.toList());
     }
 
-    //    @Builder
     public User(String username, String nickname, String email, String password) {
         this.username = username;
         this.nickname = nickname;

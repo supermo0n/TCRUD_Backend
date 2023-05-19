@@ -34,7 +34,7 @@ public class BoardController {
     UserService userService;
 
 
-    //    TODO :  - BOARD 전체출력
+    //  TODO : get Boards (paging) /board
     @GetMapping("/board")
     public ResponseEntity<Object> readBoards(@RequestParam String searchSelect,
                                              @RequestParam(required = false) String searchKeyword,
@@ -69,7 +69,7 @@ public class BoardController {
         }
     }
 
-    //    TODO : POSTMAPPING - 게시글 등록
+    //  TODO : Create Board /board/add
     @PostMapping("/board/add")
     public ResponseEntity<Object> createBoard(@Valid @RequestBody BoardDto.Request request, Principal principal) {
 
@@ -91,7 +91,7 @@ public class BoardController {
         }
     }
 
-    //  TODO : BOARD 단건조회 {id}
+    //  TODO : get Board /board/{boardId}
     @GetMapping("/board/{boardId}")
     public ResponseEntity<Object> readBoard(@PathVariable Long boardId) {
         try {
@@ -113,7 +113,7 @@ public class BoardController {
         }
     }
 
-    //    TODO : PUTMAPPING 게시글 수정
+    //  TODO : Update Board /board/{boardId}
     @PutMapping("/board/{boardId}")
     public ResponseEntity<Object> updateBoard(@PathVariable Long boardId,
                                               @RequestBody BoardDto.Request request,
@@ -140,7 +140,7 @@ public class BoardController {
         }
     }
 
-    //    TODO : DELETEMAPPING 게시글 삭제
+    //  TODO : Delete Board /board/{boardId}
     @DeleteMapping("/board/{boardId}")
     public ResponseEntity<Object> deleteBoard(@PathVariable Long boardId, Principal principal) {
         try {
@@ -169,30 +169,24 @@ public class BoardController {
         }
     }
 
+    //    --------------- [ REPLY ] ---------------
+
     //    TODO : GETMAPPING /board/{boardId}/reply
     @GetMapping("/board/{boardId}/reply")
-    public ResponseEntity<Object> readReply(@PathVariable Long boardId, @RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<Object> readReply(@PathVariable Long boardId) {
         try {
             boolean targetBoard = boardService.optionalfindById(boardId).isPresent();
 
             if (targetBoard) {
-
-                Pageable pageable = PageRequest.of(page, 5, Sort.by("id").ascending());
-                Page<ReplyDto.Response> replyPage = boardService.readBoardIdReplies(boardId, pageable);
-
-                List<ReplyDto.Response> responseList = new ArrayList<>();
-
-                for (ReplyDto.Response reply : replyPage.getContent()) {
-                    responseList.add(reply);
-                }
-
+                List<ReplyDto.Response> responseList = boardService.readBoardIdReplies(boardId);
+                Long replyCnt = boardService.countBoardIdReplies(boardId);
                 Map<String, Object> responseBody = new HashMap<>();
+
                 responseBody.put("replies", responseList);
-                responseBody.put("currentPage", replyPage.getNumber());
-                responseBody.put("totalItems", replyPage.getTotalElements());
-                responseBody.put("totalPages", replyPage.getTotalPages());
+                responseBody.put("totalReply", replyCnt);
 
                 return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
             } else {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
@@ -228,6 +222,7 @@ public class BoardController {
         }
     }
 
+    //  TODO : Update Reply /board/{boardId}/reply/{replyId}
     @PutMapping("/board/{boardId}/reply/{replyId}")
     public ResponseEntity<Object> updateReply(@PathVariable Long boardId,
                                               @PathVariable Long replyId,
@@ -242,7 +237,6 @@ public class BoardController {
                 boolean isAuthor = boardService.isAuthorReply(replyId, principal);
 
                 boolean crCheck = boardService.crossCheckBR(boardId, replyId);
-
 
                 if (isAuthor && crCheck) {
                     ReplyDto.Response response = boardService.updateReply(replyId, request);
@@ -260,6 +254,7 @@ public class BoardController {
         }
     }
 
+    //  TODO : Delete Reply /board/{boardId}/reply/{replyId}
     @DeleteMapping("/board/{boardId}/reply/{replyId}")
     public ResponseEntity<Object> deleteReply(@PathVariable Long boardId,
                                               @PathVariable Long replyId,
@@ -282,6 +277,4 @@ public class BoardController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }

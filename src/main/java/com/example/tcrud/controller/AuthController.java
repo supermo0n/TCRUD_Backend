@@ -48,6 +48,17 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserDto.LoginRequest loginRequest) {
         try {
+            if (!userService.existsUsername(loginRequest.getUsername())) {
+                /*
+                기존 BadRequest 에서 OK 응답으로 변경, dtoResponse 를 이용하여 handling
+                메소드 및 URL 노출을 최소화(취약점 비노출) 하기 위해 v0.2에서 수정 시도
+                */
+                return ResponseEntity
+                        .ok()
+                        .body(new UserDto.userStateMsgResponse(
+                                loginRequest.getUsername(), false, "존재하지 않는 ID 입니다"));
+            }
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
                             loginRequest.getPassword()
@@ -73,9 +84,15 @@ public class AuthController {
                     roles
             ));
         } catch (AuthenticationException e) {
+             /*
+               기존 HTTPStatus UNAUTHORIZED 에서 OK 응답으로 변경, dtoResponse 를 이용하여 handling
+               메소드 및 URL 노출을 최소화(취약점 비노출) 하기 위해 v0.2에서 수정 시도
+               */
+//            패스워드 불일치 시 exception
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponse("ID 또는 패스워드가 잘못되었습니다."));
+                    .ok()
+                    .body(new UserDto.userStateMsgResponse(
+                            loginRequest.getUsername(), false, "패스워드가 잘못되었습니다."));
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -88,64 +105,111 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserDto.Request signupRequest) {
         try {
             if (userService.existsUsername(signupRequest.getUsername())) {
+                 /*
+                기존 BadRequest 에서 OK 응답으로 변경, dtoResponse 를 이용하여 handling
+                메소드 및 URL 노출을 최소화(취약점 비노출) 하기 위해 v0.2에서 수정 시도
+                */
                 return ResponseEntity
-                        .badRequest()
-                        .body(new MessageResponse("사용중인 ID 입니다."));
-            }
-
-            if (userService.existsEmail(signupRequest.getEmail())) {
-                return ResponseEntity
-                        .badRequest()
-                        .body(new MessageResponse("사용중인 EMAIL 입니다."));
+                        .ok()
+                        .body(new UserDto.userStateMsgResponse(
+                                signupRequest.getUsername(), false, "사용중인 ID 입니다"));
             }
 
             if (userService.exitsNickname(signupRequest.getNickname())) {
                 return ResponseEntity
-                        .badRequest()
-                        .body(new MessageResponse("사용중인 NICKNAME 입니다."));
+                        .ok()
+                        .body(new UserDto.userStateMsgResponse(
+                                signupRequest.getNickname(), false, "사용중인 NICKNAME 입니다"));
+            }
+
+            if (userService.existsEmail(signupRequest.getEmail())) {
+                return ResponseEntity
+                        .ok()
+                        .body(new UserDto.userStateMsgResponse(
+                                signupRequest.getEmail(), false, "사용중인 EMAIL 입니다"));
             }
 
             boolean isRegistered = userService.registerUser(signupRequest);
 
             if (isRegistered) {
-                return ResponseEntity.ok(new MessageResponse("회원 가입 성공"));
+                return ResponseEntity
+                        .ok()
+                        .body(new UserDto.userStateMsgResponse(
+                                signupRequest.getUsername(), isRegistered, "회원가입 성공"));
             } else {
-                throw new RuntimeException("회원가입 실패");
+                return ResponseEntity
+                        .ok()
+                        .body(new UserDto.userStateMsgResponse(
+                                signupRequest.getUsername(), isRegistered, "회원가입 실패"));
             }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse(e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .internalServerError()
                     .body(new MessageResponse("서버 오류 발생"));
         }
     }
 
-    //  회원가입시 중복체크 -> ID, EMAIL, 닉네임
+    //  front에서 개별적인 회원정보(unique 제약 조건) 중복 체크 요청
     @GetMapping("/check/{targetParam}/{keyword}")
-    public ResponseEntity<Boolean> checkUserData(@PathVariable String targetParam,
-                                                 @PathVariable String keyword) {
+    public ResponseEntity<?> checkUserData(@PathVariable String targetParam,
+                                           @PathVariable String keyword) {
         if (targetParam.isEmpty() || keyword.isEmpty()) {
             return ResponseEntity
-                    .badRequest()
-                    .build();
+                    .ok()
+                    .body(new UserDto.userStateMsgResponse("null", false, "비정상적인 요청입니다"));
         }
 
         try {
             boolean result = userService.validationUser(targetParam, keyword);
 
-            return ResponseEntity
-                    .ok(result);
+            String message;
+
+            if (!result) {
+                if (targetParam.equals("username")) {
+                    message = "[" + keyword + "]는 사용가능한 ID 입니다.";
+                } else if (targetParam.equals("email")) {
+                    message = "[" + keyword + "]는 사용가능한 이메일 입니다.";
+                } else {
+                    message = "[" + keyword + "]는 사용가능한 닉네임입니다.";
+                }
+                 /*
+                기존 OK 에서 dtoResponse 를 이용하여 handling
+                메소드 및 URL 노출을 최소화(취약점 비노출) 하기 위해 v0.2에서 수정 시도
+                */
+                return ResponseEntity
+                        .ok()
+                        .body(new UserDto.userStateMsgResponse(targetParam, result, message));
+            } else {
+                switch (targetParam) {
+                    case "username":
+                        message = "[" + keyword + "]는 이미 사용중인 ID 입니다.";
+                        break;
+                    case "email":
+                        message = "[" + keyword + "]는 이미 사용중인 이메일입니다.";
+                        break;
+                    case "nickname":
+                        message = "[" + keyword + "]는 이미 사용중인 닉네임입니다.";
+                        break;
+                    default:
+                        message = "유효하지 않은 요청입니다.";
+                        break;
+                }
+                 /*
+                기존 BadRequest 에서 dtoResponse 를 이용하여 handling
+                메소드 및 URL 노출을 최소화(취약점 비노출) 하기 위해 v0.2에서 수정 시도
+                */
+                return ResponseEntity
+                        .ok()
+                        .body(new UserDto.userStateMsgResponse(targetParam, result, message));
+            }
         } catch (IllegalArgumentException e) {
             return ResponseEntity
-                    .badRequest()
-                    .body(false);
+                    .ok()
+                    .body(new UserDto.userStateMsgResponse(targetParam, false, "비정상적인 요청입니다"));
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(false);
+                    .body("서버 오류 발생");
         }
     }
 
@@ -175,18 +239,24 @@ public class AuthController {
     @PutMapping("/user/update")
     public ResponseEntity<?> updateUser(@RequestBody UserDto.Request updateRequest, Principal principal) {
         try {
+
             if (!principal.getName().matches(updateRequest.getUsername())) {
-                return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(new MessageResponse("유효하지 않은 요청입니다"));
             } else {
                 boolean updateUser = userService.updateUser(updateRequest);
 
                 if (updateUser) {
 
                     Authentication authentication;
+
                     if (updateRequest.isChangePwd()) {
+//                        새로 인증 시작 -> 비밀번호 변경(isChangePwd)의 경우 비밀번호 변경 후 새로운 비밀번호로 authenticate
                         authentication = authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(updateRequest.getUsername(), updateRequest.getUpdatePwd()));
                     } else {
+//                        새로 인증 시작 -> 비밀번호 변경을(!isChangePwd) 의 경우 기존 비밀번호로 authenticate
                         authentication = authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(updateRequest.getUsername(), updateRequest.getPassword()));
                     }
@@ -210,48 +280,55 @@ public class AuthController {
                             roles
                     ));
                 } else {
-                    return new ResponseEntity<>(false, HttpStatus.OK);
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("회원정보 수정 실패"));
                 }
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity
+                    .internalServerError()
+                    .body(false);
         }
     }
 
     // 회원탈퇴
-    @DeleteMapping("/user/deletion/{id}")
+    @DeleteMapping("/user/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, Principal principal) {
         try {
             Optional<User> optionalUser = userService.findByUserId(id);
 
-            if (optionalUser.isPresent())
-            {
+            if (optionalUser.isPresent()) {
                 User tempUser = optionalUser.get();
-
+    //         현재 login 유져 == 회원탈퇴 요청 계정 유져 일치여부
                 boolean authUserMatch = tempUser.getUsername().equals(principal.getName());
 
-                if (authUserMatch)
-                {
+                if (authUserMatch) {
                     boolean deleteSuccess = userService.deleteUser(id, tempUser.getUsername());
 
-                    if (deleteSuccess)
-                    {
-                        return new ResponseEntity<>(true, HttpStatus.OK);
+                    if (deleteSuccess) {
+                        return ResponseEntity
+                                .ok()
+                                .body(new MessageResponse("회원 탈퇴가 완료되었습니다."));
+                    } else {
+                        return ResponseEntity
+                                .badRequest()
+                                .body(new MessageResponse("회원 탈퇴 실패"));
                     }
+                } else {
+                    return ResponseEntity
+                            .status(HttpStatus.UNAUTHORIZED)
+                            .body(new MessageResponse("회원 탈퇴 권한이 없습니다."));
                 }
-                else
-                {
-                    return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
-                }
+            } else {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(new MessageResponse("일치하는 회원이 없습니다."));
             }
-            else
-            {
-                return new ResponseEntity<>(false, HttpStatus.NOT_FOUND);
-            }
-
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity
+                    .internalServerError()
+                    .body(new MessageResponse("서버 오류 발생"));
         }
     }
 }

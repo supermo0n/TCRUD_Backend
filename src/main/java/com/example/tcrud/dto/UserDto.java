@@ -84,8 +84,11 @@ public class UserDto {
     public static class LoginRequest
     {
         @NotBlank
+        @Pattern(regexp = "^[0-9a-zA-Z]+$")
+        @Size(min = 6, max = 20)
         private String username;
 
+        @Pattern(regexp = "^[A-Za-z\\d$@$!%*?&]{6,20}$")
         @NotBlank
         private String password;
     }
@@ -112,6 +115,8 @@ public class UserDto {
     @NoArgsConstructor
     public static class pwdCheck
     {
+        @Pattern(regexp = "^[A-Za-z\\d$@$!%*?&]{6,20}$")
+        @NotBlank
         private String password;
 
         public pwdCheck(String password)
@@ -119,4 +124,21 @@ public class UserDto {
             this.password = password;
         }
     }
+
+
+    @Getter
+    public static class userStateMsgResponse
+    {
+        private Boolean answer;
+        private String param;
+        private String message;
+
+        public userStateMsgResponse(String param, Boolean answer, String message)
+        {
+            this.param = param;
+            this.answer = answer;
+            this.message = message;
+        }
+    }
+
 }

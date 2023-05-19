@@ -13,10 +13,11 @@ import java.util.List;
 @Repository
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
-    Page<Reply> findAll(Pageable pageable);
 
-//    @Query("SELECT r FROM Reply r WHERE r.board.id = :boardId ORDER BY r.insertTime DESC")
-    Page<Reply> findByBoardId(@Param("boardId") Long boardId, Pageable pageable);
+    @Query(value = "SELECT COUNT(*) FROM TB_REPLY WHERE BOARD_ID = :boardId AND (DELETE_YN = 'N' AND (HIDDEN != 'Y' OR HIDDEN IS NULL))", nativeQuery = true)
+    Long countByBoardId(@Param("boardId") Long BoardId);
 
     List<Reply> findByWriterId(@Param("WriterId") Long userId);
+
+    List<Reply> findAllByBoardId(Long boardId);
 }
